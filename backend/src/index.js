@@ -9,6 +9,7 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import { logger } from './utils/logger.js';
 
 const app = express();
@@ -43,6 +44,7 @@ app.get('/', (req, res) => {
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Error Handling
 app.use(notFound);
