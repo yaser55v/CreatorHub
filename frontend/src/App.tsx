@@ -4,6 +4,7 @@ import { Launchpad } from "@/pages/launchpad";
 import { Login } from "@/pages/auth/Login";
 import { Register } from "@/pages/auth/Register";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { SubscriptionPage } from "@/pages/dashboard/Subscription";
 import { PublicLayout } from "@/layout/PublicLayout";
 import { AuthLayout } from "@/layout/AuthLayout";
 import { DashboardLayout } from "@/layout/DashboardLayout";
@@ -59,6 +60,7 @@ export default function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="subscription" element={<SubscriptionPage />} />
         </Route>
       </Routes>
       <Toaster />

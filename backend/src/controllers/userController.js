@@ -2,53 +2,70 @@ import { User } from '../models/userModel.js';
 import { createError } from '../utils/error.js';
 import { logger } from '../utils/logger.js';
 
-export const getCurrentUser = async (req, res) => {
+export const getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       throw createError(404, 'User not found');
     }
-    res.json(user);
+
+    // Format the response
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      accountType: user.accountType,
+      verified: user.verified
+    };
+
+    res.json(userResponse);
   } catch (error) {
     logger.error('Get current user error:', error);
-    throw error;
+    next(error);
   }
 };
 
-export const updateProfile = async (req, res) => {
+export const updateProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
       throw createError(404, 'User not found');
     }
 
-    user.name = req.body.name || user.name;
+    // Update allowed fields
+    const allowedUpdates = ['name', 'email'];
+    Object.keys(req.body).forEach((update) => {
+      if (allowedUpdates.includes(update)) {
+        user[update] = req.body[update];
+      }
+    });
+
+    // If email is being updated, require reverification
     if (req.body.email && req.body.email !== user.email) {
       const emailExists = await User.findOne({ email: req.body.email });
       if (emailExists) {
         throw createError(400, 'Email already in use');
       }
-      user.email = req.body.email;
       user.verified = false;
       user.verificationToken = Math.random().toString(36).substring(2, 15);
       user.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
       // TODO: Send new verification email
     }
 
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
-
     const updatedUser = await user.save();
-    res.json({
+
+    // Format the response
+    const userResponse = {
       id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
       accountType: updatedUser.accountType,
       verified: updatedUser.verified
-    });
+    };
+
+    res.json(userResponse);
   } catch (error) {
     logger.error('Update profile error:', error);
-    throw error;
+    next(error);
   }
 };

@@ -11,6 +11,7 @@ import {
   Video,
   Users,
   LogOut,
+  CreditCard,
 } from 'lucide-react';
 import type { RootState } from '@/store';
 import { Button } from '@/components/ui/button';
@@ -23,12 +24,13 @@ const navigation = [
   { name: 'AI Assistant', href: '/dashboard/ai-assistant', icon: MessageSquare },
   { name: 'Content Library', href: '/dashboard/library', icon: Video },
   { name: 'Community', href: '/dashboard/community', icon: Users },
+  { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCard },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
 export function DashboardLayout() {
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen] = useState(true);
   const { user } = useSelector((state: RootState) => state.auth);
 
   return (

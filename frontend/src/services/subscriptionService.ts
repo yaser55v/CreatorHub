@@ -1,18 +1,47 @@
 import { api } from './api';
 
+export type SubscriptionPlan = 'free' | 'pro' | 'enterprise';
+export type SubscriptionStatus = 'active' | 'cancelled' | 'expired';
+
 export interface Subscription {
-  plan: 'free' | 'pro' | 'enterprise';
-  status: 'active' | 'cancelled' | 'expired';
+  id: string;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
   startDate: string;
   endDate: string;
+  user: string;
 }
 
-export async function createSubscription(plan: Subscription['plan']) {
-  const response = await api.post('/subscriptions', { plan });
-  return response.data;
+export interface CreateSubscriptionResponse {
+  subscription: Subscription;
+  paymentUrl?: string; // For paid plans
 }
 
-export async function getCurrentSubscription() {
-  const response = await api.get('/subscriptions/current');
-  return response.data;
+export async function createSubscription(plan: SubscriptionPlan): Promise<CreateSubscriptionResponse> {
+  try {
+    const response = await api.post<CreateSubscriptionResponse>('/subscriptions', { plan });
+    return response.data;
+  } catch (error) {
+    console.error('Create subscription error:', error);
+    throw error;
+  }
+}
+
+export async function getCurrentSubscription(): Promise<Subscription | null> {
+  try {
+    const response = await api.get<Subscription>('/subscriptions/current');
+    return response.data;
+  } catch (error) {
+    console.error('Get current subscription error:', error);
+    return null;
+  }
+}
+
+export async function cancelSubscription(): Promise<void> {
+  try {
+    await api.post('/subscriptions/cancel');
+  } catch (error) {
+    console.error('Cancel subscription error:', error);
+    throw error;
+  }
 }
